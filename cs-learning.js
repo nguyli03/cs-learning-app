@@ -12,31 +12,42 @@ var then;
 var interval = 1000/fps;
 
 // animationID
-var animationID;
+var swapAnimationID;
+var bubbleSortAnimationID;
 
 function bubbleSort(a) {
-    var swapped;
-    do {
-        swapped = false;
-        for (var i=0; i < a.length-1; i++) {
-            if (a[i] > a[i+1]) {
-                var temp = a[i];
-                a[i] = a[i+1];
-                a[i+1] = temp;
-                swapped = true;
-            }
-        }
-    } while (swapped);
+	var i = 0;
+
+	var bubbleSortAnimation = function() {
+		var swapped = true;
+	    if(swapped) {
+	    	swapped = false;
+	        while(i < a.length - 1 && swapped == false){
+	            if (a[i] > a[i+1]) {
+	                var temp = a[i];
+	                a[i] = a[i+1];
+	                a[i+1] = temp;
+	                swap(array, i, i+1);
+	                swapped = true;
+	            }
+	            i += 1;
+	        }
+	    }
+	    bubbleSortAnimationID = requestAnimationFrame(bubbleSortAnimation);
+	    if(swapped == false)
+	    	cancelAnimationFrame(bubbleSortAnimationID);
+	}
+
+	bubbleSortAnimationID = requestAnimationFrame(bubbleSortAnimation);
 }
 
 // Main
 $(document).ready(function() {
 	init();
-	swap(array, 0, 2);
 	draw();
 });
 
-// Functions
+// Helper functions
 function swap(a, i, j) {
 	var destXLeft = a[i].x;
 	var destXRight = a[j].x;
@@ -67,20 +78,32 @@ function swap(a, i, j) {
 			if(a[i].x == destXRight && a[j].x == destXLeft) {
 				didMoveHorizontal = true;
 
-				if(a[i].y == mainY && a[j].y == mainY)
+				if(a[i].y == mainY && a[j].y == mainY) {
+					var tmp = a[i];
+					a[i] = a[j];
+					a[j] = tmp;
 					stopped = true;
+				}
 			}
 			draw();
 		}
 
-		animationID = requestAnimationFrame(swapAnimation);
+		swapAnimationID = requestAnimationFrame(swapAnimation);
 		if(stopped)
-			cancelAnimationFrame(animationID);
+			cancelAnimationFrame(swapAnimationID);
 	};
 
-	animationID = requestAnimationFrame(swapAnimation);
+	swapAnimationID = requestAnimationFrame(swapAnimation);
 }
 
+function createAnimationArray(a) {
+	var animationArray = [];
+	for(var i = 0; i < a.length; i++)
+		animationArray.push(new Entry(i*SIZE, mainY, SIZE, SIZE, a[i]))
+	return animationArray;
+}
+
+// init and draw
 function init() {
 	canvas = $('#c')[0];
 	canvas.width = 700;
@@ -92,11 +115,9 @@ function init() {
 	then = Date.now();
 
 	// YOUR CODE HERE
-	values = [3, 2, 5];
-	array = []
-	for(var i = 0; i < 3; i++) {
-		array.push(new Entry(i*SIZE, mainY, SIZE, SIZE, values[i]));
-	}
+	a = [3, 2, 1, 5, 6];
+	array = createAnimationArray(a);
+	bubbleSort(a);
 }
 
 function draw() {
