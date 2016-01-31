@@ -15,27 +15,40 @@ var interval = 1000/fps;
 var swapAnimationID;
 var bubbleSortAnimationID;
 
+// Sorting methods
 function bubbleSort(a) {
 	var i = 0;
+	var swapped = true;
+	var done = true;
 
 	var bubbleSortAnimation = function() {
-		var swapped = true;
-	    if(swapped) {
+	    if(swapped && swapAnimationID == null) {
 	    	swapped = false;
 	        while(i < a.length - 1 && swapped == false){
 	            if (a[i] > a[i+1]) {
 	                var temp = a[i];
 	                a[i] = a[i+1];
 	                a[i+1] = temp;
-	                swap(array, i, i+1);
 	                swapped = true;
+	                done = false;
+
+	                swap(array, i, i+1);
+	                i += 1;
+	                break;
 	            }
 	            i += 1;
 	        }
+	        if(i == a.length - 1 && !done) {
+	        	i = 0;
+	        	done = true;
+	        	swapped = true;
+	        }
 	    }
 	    bubbleSortAnimationID = requestAnimationFrame(bubbleSortAnimation);
-	    if(swapped == false)
+	    if(swapped == false) {
 	    	cancelAnimationFrame(bubbleSortAnimationID);
+	    	bubbleSortAnimationID = null;
+	    }
 	}
 
 	bubbleSortAnimationID = requestAnimationFrame(bubbleSortAnimation);
@@ -89,8 +102,10 @@ function swap(a, i, j) {
 		}
 
 		swapAnimationID = requestAnimationFrame(swapAnimation);
-		if(stopped)
+		if(stopped) {
 			cancelAnimationFrame(swapAnimationID);
+			swapAnimationID = null;
+		}
 	};
 
 	swapAnimationID = requestAnimationFrame(swapAnimation);
@@ -115,7 +130,7 @@ function init() {
 	then = Date.now();
 
 	// YOUR CODE HERE
-	a = [3, 2, 1, 5, 6];
+	a = [74,38,61,61,13,49,21,34,78,54,36,75,11,39,87,76,25,39,68,61];
 	array = createAnimationArray(a);
 	bubbleSort(a);
 }
@@ -124,6 +139,6 @@ function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	for(var i = 0; i < array.length; i++) {
 		ctx.strokeRect(array[i].x, array[i].y, array[i].width, array[i].height);
-		ctx.fillText(array[i].value, array[i].x + SIZE / 4, array[i].y + SIZE, array[i].width, array[i].height);
+		ctx.fillText(array[i].value, array[i].x + SIZE / 4, array[i].y + SIZE, array[i].width/2, array[i].height);
 	}
 }
