@@ -41,11 +41,11 @@ function swap(a, i, j) {
 	var destXLeft = a[i].x;
 	var destXRight = a[j].x;
 	var didMoveHorizontal = false;
+	var stopped = false;
 
 	var swapAnimation = function() {
 		var now = Date.now();
 		var timeDelta = now - then;
-
 		if(timeDelta > interval) {
 			then = now - (timeDelta % interval);
 
@@ -68,15 +68,17 @@ function swap(a, i, j) {
 				didMoveHorizontal = true;
 
 				if(a[i].y == mainY && a[j].y == mainY)
-					cancelAnimationFrame(animationID);
+					stopped = true;
 			}
 			draw();
 		}
 
 		animationID = requestAnimationFrame(swapAnimation);
-	};	
+		if(stopped)
+			cancelAnimationFrame(animationID);
+	};
 
-	requestAnimationFrame(swapAnimation);
+	animationID = requestAnimationFrame(swapAnimation);
 }
 
 function init() {
